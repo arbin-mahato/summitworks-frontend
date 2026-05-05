@@ -1,0 +1,111 @@
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { provideRouter } from '@angular/router';
+
+import { routes } from './app.routes';
+import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { 
+  LucideAngularModule, 
+  Mail, 
+  Lock, 
+  LogIn, 
+  User, 
+  UserPlus, 
+  Hotel, 
+  Calendar, 
+  LogOut, 
+  Shield,
+  MapPin,
+  Star,
+  Wifi,
+  Coffee,
+  Tv,
+  Wind,
+  Search,
+  ArrowRight,
+  ArrowLeft,
+  Users,
+  CheckCircle,
+  CreditCard,
+  Info,
+  Clock,
+  XCircle,
+  ExternalLink,
+  LayoutDashboard,
+  TrendingUp,
+  Plus,
+  MoreHorizontal,
+  MoreVertical,
+  Edit3,
+  Trash2,
+  Filter,
+  SlidersHorizontal,
+  Heart,
+  Waves,
+  Layout,
+  Check,
+  Bed,
+  AlertCircle,
+  ShieldAlert,
+  Download,
+  ChevronLeft,
+  ChevronRight
+} from 'lucide-angular';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideRouter(routes), 
+    provideClientHydration(withEventReplay()),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+    importProvidersFrom(
+      LucideAngularModule.pick({ 
+        Mail, 
+        Lock, 
+        LogIn, 
+        User, 
+        UserPlus, 
+        Hotel, 
+        Calendar, 
+        LogOut, 
+        Shield,
+        MapPin,
+        Star,
+        Wifi,
+        Coffee,
+        Tv,
+        Wind,
+        Search,
+        ArrowRight,
+        ArrowLeft,
+        Users,
+        CheckCircle,
+        CreditCard,
+        Info,
+        Clock,
+        XCircle,
+        ExternalLink,
+        LayoutDashboard,
+        TrendingUp,
+        Plus,
+        MoreHorizontal,
+        MoreVertical,
+        Edit3,
+        Trash2,
+        Filter,
+        SlidersHorizontal,
+        Heart,
+        Waves,
+        Layout,
+        Check,
+        Bed,
+        AlertCircle,
+        ShieldAlert,
+        Download,
+        ChevronLeft,
+        ChevronRight
+      })
+    )
+  ]
+};
