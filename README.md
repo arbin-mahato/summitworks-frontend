@@ -1,4 +1,4 @@
-# Summit Works - Hotel Booking Platform
+# Summit Works Assignment - Hotel Booking Platform
 
 A modern hotel booking management system built with Angular 21 and deployed on Vercel (frontend) and Render (backend).
 
@@ -16,7 +16,33 @@ A modern hotel booking management system built with Angular 21 and deployed on V
 
 ---
 
-## 🚀 Quick Start Guide
+## � Quick Test Credentials
+
+### Admin Account (Full Access)
+
+```
+Email: arbin@example.com
+Password: abc123
+```
+
+**Admin Features Available:**
+- Dashboard with key metrics
+- Hotel management (add, edit, delete)
+- Booking management (view all bookings)
+- Room availability management
+
+### Regular User Account
+You can also create your own account using the **Sign Up** page and log in with your registered credentials.
+
+---
+
+## 📹 Project Walkthrough
+
+**Watch the complete walkthrough:** [Summit Works Assignment Walkthrough](https://drive.google.com/file/d/1cAPZWT5vW15FEW4VzwZxFyRR0T0W20ZQ/view?usp=sharing)
+
+---
+
+## �🚀 Quick Start Guide
 
 ### Prerequisites
 
@@ -84,9 +110,9 @@ The app will automatically reload whenever you modify source files.
 
 ## 📖 Project Overview & System Architecture
 
-### What is Summit Works?
+### What is Summit Works Assignment?
 
-**Summit Works** is a full-stack hotel booking management system that enables users to browse hotels, check real-time room availability with interactive calendars, and make instant bookings. The platform implements role-based access control with distinct user experiences:
+**Summit Works Assignment** is a full-stack hotel booking management system that enables users to browse hotels, check real-time room availability with interactive calendars, and make instant bookings. The platform implements role-based access control with distinct user experiences:
 
 - **Regular Users**: Browse hotels, view availability, create bookings, manage booking history
 - **Administrators**: Manage hotels, rooms, inventory, and view all platform bookings
@@ -463,29 +489,7 @@ Follow the backend README for setup instructions.
 
 ---
 
-## 🔑 Test Credentials
 
-### Admin Account (Full Access)
-
-Use these credentials to access the admin panel and all administrative features:
-
-```
-Email: arbin@example.com
-Password: abc123
-```
-
-**Admin Features Available:**
-
-- Dashboard with key metrics
-- Hotel management (add, edit, delete)
-- Booking management (view all bookings)
-- Room availability management
-
-### Regular User Account
-
-You can also create your own account using the **Sign Up** page and log in with your registered credentials.
-
----
 
 ## 📞 Support
 
