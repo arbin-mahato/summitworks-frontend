@@ -71,50 +71,6 @@ The app will automatically reload whenever you modify source files.
 
 ---
 
-## 🔧 Development Setup (First Time)
-
-### 1. Install Node.js and npm
-
-- Download Node.js from [nodejs.org](https://nodejs.org/)
-- Choose the LTS (Long Term Support) version
-- Install using the default settings
-
-### 2. Verify Installation
-
-Open terminal/command prompt and verify:
-
-```bash
-node --version
-npm --version
-```
-
-You should see version numbers for both.
-
-### 3. Clone and Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/arbin-mahato/sm-frontend-main.git
-
-# Navigate to the project
-cd sm-frontend-main
-
-# Install dependencies
-npm install
-
-# Start development server
-npm start
-```
-
-### 4. Open in Browser
-
-Your default browser should open automatically. If not, manually visit:
-```
-http://localhost:4200/
-```
-
----
-
 ## 🌍 Deployment
 
 ### Frontend (Vercel)
@@ -282,9 +238,26 @@ Follow the backend README for setup instructions.
 
 ---
 
-## 🔑 Default Test Credentials
+## 🔑 Test Credentials
 
-After creating an account, use your registered email and password to log in.
+### Admin Account (Full Access)
+
+Use these credentials to access the admin panel and all administrative features:
+
+```
+Email: arbin@example.com
+Password: abc123
+```
+
+**Admin Features Available:**
+- Dashboard with key metrics
+- Hotel management (add, edit, delete)
+- Booking management (view all bookings)
+- Room availability management
+
+### Regular User Account
+
+You can also create your own account using the **Sign Up** page and log in with your registered credentials.
 
 ---
 
