@@ -14,10 +14,10 @@ export class HotelService {
 
   private sampleImages = [
     'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=800',
-    'https://images.unsplash.com/photo-1551882547-ff43c63faf76?auto=format&fit=crop&q=80&w=800',
     'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&q=80&w=800',
     'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=800',
-    'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=800'
+    'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=800',
+    'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=800',
   ];
 
   // 🔹 GET HOTELS
@@ -35,11 +35,14 @@ export class HotelService {
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(res => {
         const hotels = Array.isArray(res) ? res : (res.data || []);
-        return hotels.map((h: any, i: number) => ({
-          ...h,
-          image: h.image || this.sampleImages[i % this.sampleImages.length],
-          rating: h.rating || 4.5 + (Math.random() * 0.5)
-        }));
+        return hotels.map((h: any, i: number) => {
+          const imageUrl = h.image || this.sampleImages[i % this.sampleImages.length];
+          return {
+            ...h,
+            image: imageUrl,
+            rating: h.rating || 4.5 + (Math.random() * 0.5)
+          };
+        });
       })
     );
   }
@@ -55,8 +58,11 @@ export class HotelService {
   }
 
   // 🔹 GET CITIES
-  getCities() {
-    return this.http.get<any>(`${this.apiUrl}/cities`).pipe(
+  getCities(state?: string) {
+    let params: any = {};
+    if (state) params.state = state;
+
+    return this.http.get<any>(`${this.apiUrl}/cities`, { params }).pipe(
       map(res => {
         const data = Array.isArray(res) ? res : (res.data || []);
         return data.map((c: any) => typeof c === 'string' ? c : c.city);
@@ -98,9 +104,9 @@ export class HotelService {
     return this.http.get<any>(`${this.apiUrl}/${hotelId}/rooms`, { params }).pipe(
       map(res => {
         const rooms = Array.isArray(res) ? res : (res.data || []);
-        return rooms.map((room: any) => ({
+        return rooms.map((room: any, i: number) => ({
           ...room,
-          image: `https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80&w=800`
+          image: room.image || this.sampleImages[i % this.sampleImages.length]
         }));
       })
     );

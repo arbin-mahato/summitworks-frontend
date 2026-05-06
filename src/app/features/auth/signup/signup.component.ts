@@ -1,14 +1,17 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { LucideAngularModule, User, Mail, Lock, UserPlus } from 'lucide-angular';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
+import { LucideAngularModule, User, Mail, Lock, UserPlus, Eye, EyeOff } from 'lucide-angular';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
+
+const PASSWORD_PATTERN = /^(?=.*[A-Za-z])(?=.*\d).+$/;
 
 @Component({
   selector: 'app-signup',
   standalone: true,
   imports: [CommonModule, RouterLink, LucideAngularModule, ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="auth-page">
       <div class="auth-container">
@@ -22,29 +25,86 @@ import { CommonModule } from '@angular/common';
         <form [formGroup]="signupForm" (ngSubmit)="onSignup()" class="auth-form">
           <div class="form-group">
             <label>Full Name</label>
-            <div class="input-wrapper">
+            <div class="input-wrapper" [class.input-error]="hasError('fullName')">
               <lucide-icon name="user" size="18" class="input-icon"></lucide-icon>
               <input type="text" formControlName="fullName" placeholder="John Doe">
             </div>
+            @if (hasError('fullName')) {
+              <div class="error-text">
+                @if (signupForm.get('fullName')?.errors?.['required']) {
+                  <span>Full name is required</span>
+                } @else if (signupForm.get('fullName')?.errors?.['minlength']) {
+                  <span>Full name must be at least 3 characters</span>
+                } @else if (signupForm.get('fullName')?.errors?.['maxlength']) {
+                  <span>Full name must not exceed 80 characters</span>
+                }
+              </div>
+            }
           </div>
 
           <div class="form-group">
             <label>Email Address</label>
-            <div class="input-wrapper">
+            <div class="input-wrapper" [class.input-error]="hasError('email')">
               <lucide-icon name="mail" size="18" class="input-icon"></lucide-icon>
               <input type="email" formControlName="email" placeholder="name@example.com">
             </div>
+            @if (hasError('email')) {
+              <div class="error-text">
+                @if (signupForm.get('email')?.errors?.['required']) {
+                  <span>Email is required</span>
+                } @else if (signupForm.get('email')?.errors?.['email']) {
+                  <span>Please enter a valid email address</span>
+                } @else if (signupForm.get('email')?.errors?.['maxlength']) {
+                  <span>Email must not exceed 120 characters</span>
+                }
+              </div>
+            }
           </div>
 
           <div class="form-group">
             <label>Password</label>
-            <div class="input-wrapper">
+            <div class="input-wrapper" [class.input-error]="hasError('password')">
               <lucide-icon name="lock" size="18" class="input-icon"></lucide-icon>
-              <input type="password" formControlName="password" placeholder="••••••••">
+              <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" placeholder="••••••••">
+              <button type="button" class="password-toggle" (click)="togglePasswordVisibility()" tabindex="-1">
+                @if (showPassword()) {
+                  <lucide-icon name="eye-off" size="18"></lucide-icon>
+                } @else {
+                  <lucide-icon name="eye" size="18"></lucide-icon>
+                }
+              </button>
             </div>
             <div class="validation-hints">
-              <span class="hint" [class.valid]="signupForm.get('password')?.valid">At least 6 characters</span>
+              <span class="hint" [class.valid]="hasMinLength()">
+                <span class="hint-dot">○</span>
+                At least 6 characters
+              </span>
+              <span class="hint" [class.valid]="hasMaxLength()">
+                <span class="hint-dot">○</span>
+                Maximum 100 characters
+              </span>
+              <span class="hint" [class.valid]="hasLetter()">
+                <span class="hint-dot">○</span>
+                Contains a letter
+              </span>
+              <span class="hint" [class.valid]="hasNumber()">
+                <span class="hint-dot">○</span>
+                Contains a number
+              </span>
             </div>
+            @if (hasError('password')) {
+              <div class="error-text">
+                @if (signupForm.get('password')?.errors?.['required']) {
+                  <span>Password is required</span>
+                } @else if (signupForm.get('password')?.errors?.['minlength']) {
+                  <span>Password must be at least 6 characters</span>
+                } @else if (signupForm.get('password')?.errors?.['maxlength']) {
+                  <span>Password must not exceed 100 characters</span>
+                } @else if (signupForm.get('password')?.errors?.['pattern']) {
+                  <span>Password must contain at least one letter and one number</span>
+                }
+              </div>
+            }
           </div>
 
           @if (errorMessage) {
@@ -53,7 +113,7 @@ import { CommonModule } from '@angular/common';
             </div>
           }
 
-          <button type="submit" class="submit-btn">
+          <button type="submit" [disabled]="signupForm.invalid || isLoading" class="submit-btn">
             {{ isLoading ? 'Creating Account...' : 'Create Account' }}
           </button>
         </form>
@@ -148,18 +208,35 @@ import { CommonModule } from '@angular/common';
       position: relative;
       display: flex;
       align-items: center;
+      border-radius: var(--radius-base);
+      transition: all var(--transition-base);
+    }
+
+    .input-wrapper.input-error input {
+      border-color: #dc2626;
+      background-color: #fef2f2;
+    }
+
+    .input-wrapper.input-error input:focus {
+      border-color: #dc2626;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+
+    .input-wrapper.input-error .input-icon {
+      color: #dc2626;
     }
 
     .input-icon {
       position: absolute;
       left: var(--space-4);
       color: var(--color-gray-400);
+      transition: color var(--transition-base);
     }
 
     input {
       width: 100%;
       height: 48px;
-      padding: 0 var(--space-4) 0 48px;
+      padding: 0 48px 0 48px;
       border: 1px solid var(--color-gray-300);
       border-radius: var(--radius-base);
       transition: var(--transition-base);
@@ -171,31 +248,66 @@ import { CommonModule } from '@angular/common';
       box-shadow: var(--shadow-colored);
     }
 
-    .validation-hints {
+    .password-toggle {
+      position: absolute;
+      right: var(--space-4);
+      background: none;
+      border: none;
+      color: var(--color-gray-400);
+      cursor: pointer;
       display: flex;
-      flex-direction: column;
-      gap: 2px;
-      margin-top: 4px;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+      transition: color var(--transition-base);
     }
 
-    .hint {
-      font-size: 11px;
-      color: var(--color-gray-500);
+    .password-toggle:hover {
+      color: var(--color-gray-600);
+    }
+
+    .password-toggle lucide-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    .error-text {
+      font-size: 12px;
+      color: #dc2626;
+      margin-top: 4px;
       display: flex;
       align-items: center;
       gap: 4px;
     }
 
-    .hint::before {
-      content: '○';
+    .validation-hints {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--color-gray-500);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color var(--transition-base);
+    }
+
+    .hint-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      font-size: 10px;
     }
 
     .hint.valid {
       color: var(--color-success-600);
-    }
-
-    .hint.valid::before {
-      content: '✓';
     }
 
     .submit-btn {
@@ -206,6 +318,8 @@ import { CommonModule } from '@angular/common';
       border-radius: var(--radius-base);
       transition: var(--transition-base);
       margin-top: var(--space-2);
+      border: none;
+      cursor: pointer;
     }
 
     .error-message {
@@ -249,20 +363,71 @@ export class SignupComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
 
+  showPassword = signal(false);
+  passwordValue = signal('');
+
   signupForm: FormGroup = this.fb.group({
-    fullName: ['', [Validators.required]],
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]]
+    fullName: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(80)
+      ]
+    ],
+    email: [
+      '',
+      [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(120)
+      ]
+    ],
+    password: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(6),
+        Validators.maxLength(100),
+        Validators.pattern(PASSWORD_PATTERN)
+      ]
+    ]
   });
+
+  // Computed signals for password validation hints
+  hasMinLength = computed(() => this.passwordValue().length >= 6);
+  hasMaxLength = computed(() => this.passwordValue().length > 0 && this.passwordValue().length <= 100);
+  hasLetter = computed(() => /[A-Za-z]/.test(this.passwordValue()));
+  hasNumber = computed(() => /\d/.test(this.passwordValue()));
 
   errorMessage: string | null = null;
   isLoading = false;
+
+  constructor() {
+    // Subscribe to password changes to update the signal
+    this.signupForm.get('password')?.valueChanges.subscribe(value => {
+      this.passwordValue.set(value || '');
+    });
+  }
+
+  get passwordControl(): AbstractControl | null {
+    return this.signupForm.get('password');
+  }
+
+  hasError(fieldName: string): boolean {
+    const control = this.signupForm.get(fieldName);
+    return control ? control.invalid && (control.dirty || control.touched) : false;
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword.update(value => !value);
+  }
 
   onSignup() {
     if (this.isLoading) return;
 
     if (this.signupForm.invalid) {
-      this.errorMessage = 'Please fill in all fields correctly. Password must be at least 6 characters.';
+      this.errorMessage = 'Please fix the validation errors above';
       return;
     }
 

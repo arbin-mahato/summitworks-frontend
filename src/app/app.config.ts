@@ -51,7 +51,9 @@ import {
   ShieldAlert,
   Download,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Eye,
+  EyeOff
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -104,7 +106,9 @@ export const appConfig: ApplicationConfig = {
         ShieldAlert,
         Download,
         ChevronLeft,
-        ChevronRight
+        ChevronRight,
+        Eye,
+        EyeOff
       })
     )
   ]

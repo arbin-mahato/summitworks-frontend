@@ -6,6 +6,16 @@ A modern hotel booking management system built with Angular 21 and deployed on V
 
 ---
 
+## 🌐 Live Deployment
+
+| Environment     | URL                                      |
+| --------------- | ---------------------------------------- |
+| **Frontend**    | https://sm-frontend-main.vercel.app/     |
+| **Backend API** | https://summitworks-project.onrender.com |
+| **Live Demo**   | https://sm-frontend-main.vercel.app/     |
+
+---
+
 ## 🚀 Quick Start Guide
 
 ### Prerequisites
@@ -45,6 +55,7 @@ npm start
 ```
 
 The application will automatically open in your browser at:
+
 ```
 http://localhost:4200/
 ```
@@ -62,42 +73,248 @@ The app will automatically reload whenever you modify source files.
 
 ## 📋 Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm start` | Runs the development server at http://localhost:4200 |
-| `npm run build` | Builds the app for production with SSR support |
-| `npm run serve:ssr` | Serves the SSR production build locally |
-| `npm test` | Runs unit tests using Angular testing framework |
+| Command             | Description                                          |
+| ------------------- | ---------------------------------------------------- |
+| `npm start`         | Runs the development server at http://localhost:4200 |
+| `npm run build`     | Builds the app for production with SSR support       |
+| `npm run serve:ssr` | Serves the SSR production build locally              |
+| `npm test`          | Runs unit tests using Angular testing framework      |
+
+---
+
+## 📖 Project Overview & System Architecture
+
+### What is Summit Works?
+
+**Summit Works** is a full-stack hotel booking management system that enables users to browse hotels, check real-time room availability with interactive calendars, and make instant bookings. The platform implements role-based access control with distinct user experiences:
+
+- **Regular Users**: Browse hotels, view availability, create bookings, manage booking history
+- **Administrators**: Manage hotels, rooms, inventory, and view all platform bookings
+
+---
+
+### Complete Technology Stack
+
+#### Frontend (This Repository)
+
+- **Angular 21** - Modern component-based framework with signals
+- **TypeScript 5+** - Type-safe development with strict checking
+- **Tailwind CSS 3** - Utility-first CSS for rapid UI development
+- **RxJS** - Reactive programming for async operations
+- **Angular Signals** - Fine-grained reactivity for state management
+- **Lucide Icons** - Beautiful SVG icons library
+- **Angular SSR** - Server-side rendering for better SEO and performance
+
+#### Backend
+
+- **Java 17** - Modern LTS runtime with improved performance
+- **Spring Boot 3.3.5** - Enterprise framework for rapid development
+- **Spring Security + JWT** - Stateless token-based authentication
+- **PostgreSQL** - Robust relational database with ACID compliance
+- **Flyway** - Version-controlled database migrations
+- **Maven** - Dependency management and build automation
+
+#### Deployment & Infrastructure
+
+- **Frontend Hosting**: Vercel (CI/CD enabled)
+- **Backend Hosting**: Render (Container-based deployment)
+- **Database**: PostgreSQL (Managed cloud database)
+- **CDN**: Cloudflare (Static assets and image optimization)
+
+---
+
+### Key Architectural Decisions
+
+#### 1. **Stateless JWT Authentication**
+
+- Tokens contain user ID and role claims
+- No server-side session storage needed
+- Scales horizontally without session synchronization
+- Suitable for both web and mobile clients
+
+#### 2. **Database-First Availability Logic**
+
+- Room availability calculated from actual bookings table
+- Prevents inconsistencies between room flags and booking data
+- Accurate 7-day calendar with real-time updates
+- Supports complex overlapping date queries
+
+#### 3. **Three-Tier Frontend Architecture**
+
+```
+Presentation Layer (Components)
+           ↓
+Business Logic Layer (Services, Guards)
+           ↓
+Data Access Layer (API, Interceptors)
+```
+
+- Clear separation of concerns
+- Reusable components and services
+- Testable and maintainable code
+
+#### 4. **Role-Based Access Control (RBAC)**
+
+- Frontend: Route guards and UI hiding (immediate feedback)
+- Backend: Spring Security enforcement (security guarantee)
+- Two roles: USER (booking) and ADMIN (management)
+- Defense in depth approach
+
+#### 5. **Mobile-First Responsive Design**
+
+- Optimized for small screens first
+- Progressive enhancement for tablets and desktops
+- Single responsive codebase
+- Touch-friendly interface
+
+---
+
+### Data Flow Architecture
+
+```
+User Action
+    ↓
+Component Event Handler
+    ├─→ [Local Updates] → Signal Update → Re-render
+    └─→ [API Required]
+         ↓
+    Service Layer
+    (Business Logic)
+         ↓
+    HTTP Interceptor
+    (Add JWT Token)
+         ↓
+    Backend API
+    (Authentication & Authorization)
+         ↓
+    Database Query
+    (PostgreSQL)
+         ↓
+    Response Flow
+    Error Handling
+         ↓
+    Service Updates Signal
+         ↓
+    Component Re-renders
+```
+
+---
+
+### Security Architecture
+
+**Defense in Depth** (4 layers):
+
+1. **Frontend Validation** - Input sanitization, route guards, client-side validation
+2. **Network Security** - HTTPS, JWT in Authorization header, CORS configured
+3. **Backend Authorization** - Spring Security filters, JWT validation, role checks
+4. **Database Security** - Prepared statements, FK constraints, password hashing with BCrypt
+
+**Key Security Features**:
+
+- JWT tokens expire after 60 minutes
+- Passwords hashed with BCrypt (salted)
+- Role-based method security (`@PreAuthorize`)
+- CORS restricted to frontend domain
+- No sensitive data in tokens or logs
+
+---
+
+### Core Features Implementation
+
+#### User Booking Flow
+
+1. User searches hotels by location and dates
+2. System queries available rooms (calculates from bookings table)
+3. 7-day calendar shows availability visually
+4. User selects dates and available room
+5. Booking created instantly with confirmation
+6. User can view/manage bookings anytime
+
+#### Admin Capabilities
+
+- View complete booking history with user and hotel details
+- Create new rooms under existing hotels
+- Delete rooms with validation (prevents deletion if bookings exist)
+- Dashboard with key metrics
+- Export booking reports
+
+#### Real-Time Availability
+
+- Queries booking table for date overlaps
+- Calculates available rooms for each day
+- Updates as new bookings are created
+- Visual 7-day calendar with color indicators
+
+---
+
+### Project Structure
+
+```
+src/
+├── app/
+│   ├── core/
+│   │   ├── guards/              # Route protection (admin, auth)
+│   │   ├── interceptors/        # JWT attachment, error handling
+│   │   ├── models/              # TypeScript interfaces
+│   │   └── services/            # API & business logic
+│   │       ├── auth.service.ts       # Authentication
+│   │       ├── hotel.service.ts      # Hotels & rooms
+│   │       └── booking.service.ts    # Booking logic
+│   ├── features/
+│   │   ├── admin/               # Admin-only routes
+│   │   │   ├── dashboard/
+│   │   │   ├── booking-management/
+│   │   │   └── hotel-management/
+│   │   ├── auth/                # Login & signup
+│   │   ├── hotels/              # Browse & book
+│   │   └── bookings/            # User bookings
+│   ├── layout/                  # Header, footer, navigation
+│   ├── app.routes.ts            # Route configuration
+│   └── app.ts                   # Main component
+├── environments/                # Configuration per environment
+├── main.ts                      # Application bootstrap
+└── styles.css                   # Global Tailwind CSS
+```
+
+---
+
+### Performance Optimizations
+
+- **Frontend**: Lazy loading routes, image optimization, code splitting
+- **Backend**: Database indexing, query optimization, connection pooling
+- **Caching**: Browser cache headers, service worker ready
+- **Bundle Size**: Tree shaking, minification, no unused dependencies
+
+---
+
+### For Detailed Architecture Documentation
+
+👉 **See [ARCHITECTURE.md](ARCHITECTURE.md)** for in-depth information on:
+
+- System flows (diagrams and sequences)
+- Component architecture
+- Database schema design
+- Security implementation details
+- Error handling strategy
+- Extensibility & future enhancements
+- Deployment configurations
+- Performance considerations
+- CI/CD pipeline setup
 
 ---
 
 ## 🌍 Deployment
 
-### Frontend (Vercel)
-The frontend is automatically deployed to Vercel whenever you push to the `main` branch.
+The application is deployed on modern cloud platforms with automatic CI/CD:
 
-**Live URL:** https://sm-frontend-main.vercel.app/
+**Frontend**: Automatically deployed to Vercel on every `main` branch push
 
-### Backend (Render)
-The backend API is deployed on Render.
+- Build: `npm run build`
+- Deploy: Push to GitHub (automatic)
 
-**API URL:** https://summitworks-project.onrender.com/
+**Backend**: Deployed on Render with container orchestration
 
-### Manual Deployment
-
-To deploy manually:
-
-```bash
-# Build the project
-npm run build
-
-# Push to GitHub
-git add .
-git commit -m "Deployment update"
-git push origin main
-
-# Vercel will automatically deploy
-```
+- See [Backend Repository](https://github.com/arbin-mahato/summitworks-project) for deployment instructions
 
 ---
 
@@ -140,6 +357,7 @@ src/
 ## 📱 Features
 
 ### User Features
+
 - ✅ **User Authentication** - Secure login and registration
 - ✅ **Hotel Search** - Filter hotels by location, date, and duration
 - ✅ **Hotel Details** - View detailed information and room availability
@@ -148,6 +366,7 @@ src/
 - ✅ **Responsive Design** - Works on desktop, tablet, and mobile
 
 ### Admin Features
+
 - ✅ **Admin Dashboard** - View key metrics and statistics
 - ✅ **Hotel Management** - Add, edit, and delete hotels
 - ✅ **Booking Management** - View all platform bookings
@@ -165,11 +384,13 @@ The app automatically uses different API endpoints based on the environment:
 ### Current Configuration
 
 **Development:**
+
 ```
 Backend API: https://summitworks-project.onrender.com
 ```
 
 **Production:**
+
 ```
 Backend API: https://summitworks-project.onrender.com
 ```
@@ -193,6 +414,7 @@ This will start the test runner in watch mode. Tests will re-run whenever you mo
 ### Issue: `npm install` fails
 
 **Solution:**
+
 ```bash
 # Clear npm cache
 npm cache clean --force
@@ -204,6 +426,7 @@ npm install
 ### Issue: Port 4200 already in use
 
 **Solution:**
+
 ```bash
 # Use a different port
 ng serve --port 4300
@@ -214,6 +437,7 @@ Then visit `http://localhost:4300/`
 ### Issue: Images not loading
 
 **Solution:**
+
 - Check your internet connection
 - Images are loaded from Unsplash CDN
 - Ensure ad-blockers aren't blocking image requests
@@ -222,6 +446,7 @@ Then visit `http://localhost:4300/`
 ### Issue: API requests failing (404)
 
 **Solution:**
+
 - Verify backend is running or deployed
 - Check the API URL in `src/environments/environment.ts`
 - Ensure CORS is properly configured on the backend
@@ -250,6 +475,7 @@ Password: abc123
 ```
 
 **Admin Features Available:**
+
 - Dashboard with key metrics
 - Hotel management (add, edit, delete)
 - Booking management (view all bookings)

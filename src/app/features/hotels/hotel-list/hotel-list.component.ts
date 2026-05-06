@@ -22,7 +22,7 @@ import { FormsModule } from '@angular/forms';
           <!-- STATE DROPDOWN -->
           <div class="filter-item">
             <label><lucide-icon name="map-pin" size="14"></lucide-icon> State</label>
-            <select [(ngModel)]="searchState">
+            <select [(ngModel)]="searchState" (ngModelChange)="onStateChange($event)">
               <option value="">All States</option>
               <option *ngFor="let state of states()" [value]="state">
                 {{ state }}
@@ -33,13 +33,16 @@ import { FormsModule } from '@angular/forms';
           <!-- CITY DROPDOWN / INPUT -->
           <div class="filter-item">
             <label><lucide-icon name="map-pin" size="14"></lucide-icon> City</label>
-            <select [(ngModel)]="searchCity" *ngIf="cities().length > 0">
+            <select [(ngModel)]="searchCity" *ngIf="!isCitiesLoading() && cities().length > 0">
               <option value="">All Cities</option>
               <option *ngFor="let city of cities()" [value]="city">
                 {{ city }}
               </option>
             </select>
-            <input *ngIf="cities().length === 0" type="text" [(ngModel)]="searchCity" placeholder="e.g. San Diego">
+            <input *ngIf="!isCitiesLoading() && cities().length === 0" type="text" [(ngModel)]="searchCity" placeholder="e.g. San Diego">
+            <select disabled *ngIf="isCitiesLoading()">
+              <option>Loading cities...</option>
+            </select>
           </div>
 
           <!-- DATE -->
@@ -48,11 +51,7 @@ import { FormsModule } from '@angular/forms';
             <input type="date" [(ngModel)]="searchDate">
           </div>
 
-          <!-- DAYS -->
-          <div class="filter-item">
-            <label><lucide-icon name="sliders-horizontal" size="14"></lucide-icon> Days ({{ searchDays }})</label>
-            <input type="range" min="1" max="14" [(ngModel)]="searchDays">
-          </div>
+          <!-- DAYS (Hidden, Default: 7) -->
 
           <button class="search-btn" (click)="search()">
             <lucide-icon name="search" size="18"></lucide-icon>
@@ -200,6 +199,7 @@ export class HotelListComponent implements OnInit {
   // Dropdown data
   states = signal<string[]>([]);
   cities = signal<string[]>([]);
+  isCitiesLoading = signal<boolean>(false);
 
   // Filters
   searchState: string = '';
@@ -223,14 +223,25 @@ export class HotelListComponent implements OnInit {
     });
   }
 
-  loadCities() {
-    this.hotelService.getCities().subscribe({
+  loadCities(state?: string) {
+    this.isCitiesLoading.set(true);
+    this.hotelService.getCities(state).subscribe({
       next: (res: any) => {
         const data = Array.isArray(res) ? res : (res.data || []);
         this.cities.set(data);
+        this.isCitiesLoading.set(false);
       },
-      error: (err) => console.error('Error fetching cities', err)
+      error: (err) => {
+        console.error('Error fetching cities', err);
+        this.cities.set([]);
+        this.isCitiesLoading.set(false);
+      }
     });
+  }
+
+  onStateChange(newState: string) {
+    this.searchCity = '';
+    this.loadCities(newState);
   }
 
   loadHotels() {
@@ -257,3 +268,8 @@ export class HotelListComponent implements OnInit {
     this.loadHotels();
   }
 }
+
+
+
+
+
