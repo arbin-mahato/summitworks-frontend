@@ -12,6 +12,14 @@ import { Hotel, Room } from '../../../core/models';
   standalone: true,
   imports: [CommonModule, RouterLink, LucideAngularModule, FormsModule],
   template: `
+    <!-- Full Page Loading State -->
+    <div class="full-page-loader" *ngIf="isLoadingHotel()">
+      <div class="loader-content">
+        <div class="spinner-large"></div>
+        <p>Loading hotel details...</p>
+      </div>
+    </div>
+
     <div class="detail-page" *ngIf="hotel()">
       <!-- Breadcrumb / Back Navigation -->
       <div class="top-nav">
@@ -134,6 +142,43 @@ import { Hotel, Room } from '../../../core/models';
   `,
   styles: [`
     .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    
+    .full-page-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .loader-content {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .spinner-large {
+      width: 60px;
+      height: 60px;
+      border: 4px solid #f3f4f6;
+      border-top-color: #2563eb;
+      border-right-color: #2563eb;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .loader-content p {
+      font-size: 16px;
+      color: #6b7280;
+      font-weight: 600;
+    }
     
     .top-nav {
       background: #f8fafc;
@@ -338,8 +383,30 @@ import { Hotel, Room } from '../../../core/models';
     .amenities-grid { display: flex; flex-direction: column; gap: 16px; }
     .amenity { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; color: #374151; }
 
-    .loading-state { padding: 80px; text-align: center; color: #9ca3af; }
-    .spinner { width: 40px; height: 40px; border: 3px solid #f3f4f6; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    .loading-state { 
+      padding: 100px 80px; 
+      text-align: center; 
+      color: #9ca3af;
+      background: #f9fafb;
+      border-radius: 16px;
+      border: 2px dashed #e5e7eb;
+    }
+
+    .loading-state p {
+      font-weight: 600;
+      margin-top: 16px;
+    }
+
+    .spinner { 
+      width: 50px; 
+      height: 50px; 
+      border: 4px solid #f3f4f6; 
+      border-top-color: #2563eb;
+      border-right-color: #2563eb;
+      border-radius: 50%; 
+      animation: spin 0.8s linear infinite; 
+      margin: 0 auto 16px; 
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     @media (max-width: 992px) {
@@ -358,6 +425,7 @@ export class HotelDetailComponent implements OnInit {
   hotel = signal<Hotel | undefined>(undefined);
   rooms = signal<Room[]>([]);
   isLoading = signal(false);
+  isLoadingHotel = signal(true);
 
   checkIn: string = '';
   checkOut: string = '';
@@ -385,9 +453,11 @@ export class HotelDetailComponent implements OnInit {
 
       if (hotel) {
         this.hotel.set(hotel);
+        this.isLoadingHotel.set(false);
         this.loadRooms();
       } else {
         console.error("Hotel not found");
+        this.isLoadingHotel.set(false);
       }
     });
   }
