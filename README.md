@@ -125,7 +125,6 @@ The app will automatically reload whenever you modify source files.
 
 - **Angular 21** - Modern component-based framework with signals
 - **TypeScript 5+** - Type-safe development with strict checking
-- **Tailwind CSS 3** - Utility-first CSS for rapid UI development
 - **RxJS** - Reactive programming for async operations
 - **Angular Signals** - Fine-grained reactivity for state management
 - **Lucide Icons** - Beautiful SVG icons library
@@ -299,7 +298,6 @@ src/
 │   └── app.ts                   # Main component
 ├── environments/                # Configuration per environment
 ├── main.ts                      # Application bootstrap
-└── styles.css                   # Global Tailwind CSS
 ```
 
 ---
@@ -350,7 +348,6 @@ The application is deployed on modern cloud platforms with automatic CI/CD:
 
 - **Angular 21** - Modern web framework with standalone components
 - **TypeScript** - Type-safe JavaScript
-- **Tailwind CSS** - Utility-first CSS framework
 - **RxJS** - Reactive programming library
 - **Angular SSR** - Server-side rendering for better performance
 - **Signals** - Modern Angular state management
@@ -528,7 +525,6 @@ git pull origin main
 
 - [Angular Documentation](https://angular.io/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [Tailwind CSS](https://tailwindcss.com/docs)
 - [RxJS Documentation](https://rxjs.dev/)
 
 ---
